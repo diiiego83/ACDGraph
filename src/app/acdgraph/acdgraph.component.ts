@@ -16,12 +16,10 @@ export class AcdgraphComponent implements AfterViewInit {
 
   private _cs: HTMLCanvasElement;
   private _cx: CanvasRenderingContext2D;
-  public _cs_autosize = false;
+  public _cs_autosize = true;
   public file: any;
   private _image: ImageBitmap;
   private _zoom = 1.0;
-  private _originalW = 0.0;
-  private _originalH = 0.0;
 
   public ngAfterViewInit() {
     this._cs = this.canvas.nativeElement;
@@ -126,11 +124,11 @@ export class AcdgraphComponent implements AfterViewInit {
       pos: 100
     };
     let cmap: number[];
-    if (true) {
-      cmap = ColorMap.custom([pt1, pt2]);
-    }
+    // if (true) {
+      // cmap = ColorMap.custom([pt1, pt2]);
+    // }
     // else {
-    //   cmap = ColorMap.create(CMapModel.RED);
+      cmap = ColorMap.create(CMapModel.REDGRAY);
     // }
     const ncol = 3937;
     const nrow = 563;
@@ -161,21 +159,20 @@ export class AcdgraphComponent implements AfterViewInit {
 
     const daddy: HTMLDivElement = this.daddy.nativeElement;
     if (this._cs_autosize) {
-      this._cs.height = Math.min(nrow, daddy.clientHeight - 2);
-      this._cs.width = Math.min(ncol, daddy.clientWidth - 2);
+      this._cs.height = Math.min(nrow, daddy.clientHeight - 2 - 100);
+      this._cs.width = Math.min(ncol, daddy.clientWidth - 2 - 100);
     } else {
-      this._cs.height = daddy.clientHeight - 2;
-      this._cs.width = daddy.clientWidth - 2;
+      this._cs.height = daddy.clientHeight - 2 - 100;
+      this._cs.width = daddy.clientWidth - 2 - 100;
     }
 
-    this._cs.width -= 100;
-
-    createImageBitmap(imagedata, 0, 0, this._cs.width, this._cs.height).then(image => {
+    // this._cs.width -= 100;
+    // const nrox = 1500;
+    // const ncox = ncol;
+    createImageBitmap(imagedata, 0, 0, ncol, nrow).then(image => {
       // this._cx.drawImage(image, 0, 0);
       this._image = image;
-      this._originalW = image.width;
-      this._originalH = image.height;
-      this._cx.drawImage(image, 0, 0, image.width, image.height);
+      this._cx.drawImage(image, 0, 0, this._cs.width, this._cs.height);
     });
   }
 
@@ -193,19 +190,19 @@ export class AcdgraphComponent implements AfterViewInit {
   private plus() {
     this._zoom += 0.05;
     this._cx.clearRect(0, 0, this._cs.width, this._cs.height);
-    this._cx.drawImage(this._image, 0, 0, this._image.width * this._zoom, this._image.height * this._zoom);
+    this._cx.drawImage(this._image, 0, 0, this._cs.width * this._zoom, this._cs.height * this._zoom);
   }
 
   private minus() {
     this._zoom -= 0.05;
     this._cx.clearRect(0, 0, this._cs.width, this._cs.height);
-    this._cx.drawImage(this._image, 0, 0, this._image.width * this._zoom, this._image.height * this._zoom);
+    this._cx.drawImage(this._image, 0, 0, this._cs.width * this._zoom, this._cs.height * this._zoom);
   }
 
   private reset() { // save original image measure
     this._zoom = 1.00;
     this._cx.clearRect(0, 0, this._cs.width, this._cs.height);
-    this._cx.drawImage(this._image, 0, 0, this._originalW, this._originalH);
+    this._cx.drawImage(this._image, 0, 0, this._cs.width, this._cs.height);
   }
 
   private testcore() {
