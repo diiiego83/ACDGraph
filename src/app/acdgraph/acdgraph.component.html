@@ -1,0 +1,33 @@
+<!-- <div class="btn btn-primary" (click)="test()"  style="margin: 5px">click</div> -->
+<!-- <div class="btn btn-primary" (click)="clear()" style="margin: 5px">click</div> -->
+<!-- <div class="h-100 w-100" style="background-color: yellow;"> -->
+<!-- <div class="flex-fill"></div> -->
+<!-- <div class="flex-fill d-flex flex-row"> -->
+<!-- <div class="flex-fill"></div> -->
+<!-- <div class="h-100 w-100" #canvasdaddy> -->
+<!-- <canvas #canvas [width]="_cs_w" [height]="_cs_h" style="border: 0px solid #000000; background-color: #ffffff;"></canvas> -->
+<!-- </div> -->
+<!-- <div class="flex-fill"></div> -->
+<!-- </div> -->
+<!-- <div class="flex-fill"></div> -->
+<!-- </div> -->
+
+<div class="h-100 d-flex flex-column">
+  <div style="height: 60px; background-color: #aaaaaa">
+    <div class="btn btn-primary" (click)="test()" style="margin: 10px">TEST</div>
+    <div class="btn btn-primary" (click)="clear()" style="margin: 10px">CLEAR</div>
+    <div class="btn btn-primary" (click)="mode()" style="margin: 10px">MODE</div>
+    <input type="file" id="fileInput" (change)="openFile($event)">
+  </div>
+  <div class="h-100 d-flex flex-row" #daddy style="background: lightgray">
+    <div class="flex-grow-1"></div>
+    <div class="h-100 d-flex flex-column">
+      <div class="flex-grow-1"></div>
+      <canvas #canvas width="0" height="0" style="
+                    display: block;
+                    border: 1px solid black;"></canvas>
+      <div class="flex-grow-1"></div>
+    </div>
+    <div class="flex-grow-1"></div>
+  </div>
+</div>
