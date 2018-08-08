@@ -1,18 +1,4 @@
-<!-- <div class="btn btn-primary" (click)="test()"  style="margin: 5px">click</div> -->
-<!-- <div class="btn btn-primary" (click)="clear()" style="margin: 5px">click</div> -->
-<!-- <div class="h-100 w-100" style="background-color: yellow;"> -->
-<!-- <div class="flex-fill"></div> -->
-<!-- <div class="flex-fill d-flex flex-row"> -->
-<!-- <div class="flex-fill"></div> -->
-<!-- <div class="h-100 w-100" #canvasdaddy> -->
-<!-- <canvas #canvas [width]="_cs_w" [height]="_cs_h" style="border: 0px solid #000000; background-color: #ffffff;"></canvas> -->
-<!-- </div> -->
-<!-- <div class="flex-fill"></div> -->
-<!-- </div> -->
-<!-- <div class="flex-fill"></div> -->
-<!-- </div> -->
-
-<div class="h-100 d-flex flex-column">
+<!-- <div class="h-100 d-flex flex-column">
   <div style="height: 60px; background-color: #aaaaaa">
     <div class="btn btn-primary" (click)="test()" style="margin: 10px">TEST</div>
     <div class="btn btn-primary" (click)="clear()" style="margin: 10px">CLEAR</div>
@@ -32,5 +18,21 @@
       <div class="flex-grow-1"></div>
     </div>
     <div class="flex-grow-1"></div>
+  </div>
+</div> -->
+
+<div style="height: 100%; display: flex; flex-direction: column;">
+  <div style="height: 40px; background-color: #888888">
+      <button (click)="test()" style="margin: 10px">TEST</button>
+      <button (click)="clearALL()" style="margin: 10px">CLEAR</button>
+      <button (click)="plus()" style="margin: 10px">PLUS</button>
+      <button (click)="minus()" style="margin: 10px">MINUS</button>
+      <button (click)="reset()" style="margin: 10px">RESET</button>
+  </div>
+  <div #daddy style="display: flex; flex-direction: row; flex-grow: 1; margin:50px;">
+    <canvas style="flex-grow: 1" #canvas
+            [ngStyle]="style"
+            width="0" height="0">
+    </canvas>
   </div>
 </div>
