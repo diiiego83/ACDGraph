@@ -13,10 +13,48 @@
 //   console.log(buff.readFloatBE(3937 * 200 * 4 + ii * 4));
 // }
 
-const x = new Float32Array(4);
-x[0] = 1.234;
-x[1] = 2.456;
-x[2] = 3.567;
-x[3] = 4.678;
-console.log(Math.max.apply(Math, x));
-console.log(Math.min.apply(Math, x));
+import * as fs from 'fs';
+
+const data = fs.readFileSync('../../../cmap/jet.raw');
+
+const sr = 0, sg = 256 * 4, sb = 512 * 4;
+const rb = new Float32Array(256);
+const gb = new Float32Array(256);
+const bb = new Float32Array(256);
+for (let ii = 0, jj = 0; ii < data.length / 3; ii += 4, jj++) {
+  rb[jj] = data.readFloatLE(sr + ii);
+  gb[jj] = data.readFloatLE(sg + ii);
+  bb[jj] = data.readFloatLE(sb + ii);
+}
+
+let minx = rb[0];
+let maxx = rb[0];
+rb.forEach(val => { if (val < minx) { minx = val; } if (val > maxx) { maxx = val; } });
+let ratio = maxx - minx;
+if (ratio === 0.0) { ratio = 1.0; }
+ratio = 255.0 / ratio;
+
+const rv = new Uint8Array(256);
+const gv = new Uint8Array(256);
+const bv = new Uint8Array(256);
+for (let ii = 0; ii < 256; ii ++) {
+  rv[ii] = 0x000000ff & Math.round(rb[ii] * ratio);
+  gv[ii] = 0x000000ff & Math.round(gb[ii] * ratio);
+  bv[ii] = 0x000000ff & Math.round(bb[ii] * ratio);
+}
+
+for (let ii = 0; ii < 256; ii ++) {
+  console.log(ii + ') ' + rv[ii] + ', ' + gv[ii] + ', ' + bv[ii]);
+}
+
+
+// const oReq = new XMLHttpRequest();
+// oReq.open('GET', '/cmap/gray.raw', true);
+// oReq.responseType = 'arraybuffer';
+// oReq.onload = oEvent => {
+//   const arrayBuffer = oReq.response; // Note: not oReq.responseText
+//   if (arrayBuffer) {
+//     console.log(arrayBuffer);
+//   }
+// };
+// oReq.send(null);
