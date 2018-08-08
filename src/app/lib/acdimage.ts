@@ -42,7 +42,7 @@ export class ACDImage {
           imagedata.data[offsetimg + 0] = (cmap[offsetcmap] >> 0) & 0xff; // RED
           imagedata.data[offsetimg + 1] = (cmap[offsetcmap] >> 8) & 0xff; // GREEN
           imagedata.data[offsetimg + 2] = (cmap[offsetcmap] >> 16) & 0xff; // BLUE
-          imagedata.data[offsetimg + 3] = (cmap[offsetcmap] >> 24) & 0xff; // ALPHA [always 255 (0xff)]
+          imagedata.data[offsetimg + 3] = (cmap[offsetcmap] >> 24) & 0xff; // ALPHA always 255 (0xff)
         }
       }
       createImageBitmap(imagedata, 0, 0, this._data_ncolumn, this._data_nline).then(image => {

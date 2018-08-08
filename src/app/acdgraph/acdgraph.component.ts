@@ -86,7 +86,7 @@ export class AcdgraphComponent implements AfterViewInit {
 
   private render() {
     this.clear();
-    const cmap = ColorMap.create(CMapModel.REDBLUE);
+    const cmap = ColorMap.create(CMapModel.RED);
     this._img.produceImage(cmap).then(image => {
       this._cx.drawImage(image, 0, 0, this._cs.width, this._cs.height);
     });

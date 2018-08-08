@@ -37,14 +37,17 @@ ratio = 255.0 / ratio;
 const rv = new Uint8Array(256);
 const gv = new Uint8Array(256);
 const bv = new Uint8Array(256);
+const cmap: number[] = [256];
 for (let ii = 0; ii < 256; ii ++) {
-  rv[ii] = 0x000000ff & Math.round(rb[ii] * ratio);
-  gv[ii] = 0x000000ff & Math.round(gb[ii] * ratio);
-  bv[ii] = 0x000000ff & Math.round(bb[ii] * ratio);
+  rv[ii] = Math.round(rb[ii] * ratio);
+  gv[ii] = Math.round(gb[ii] * ratio);
+  bv[ii] = Math.round(bb[ii] * ratio);
+  cmap[ii] = (0xff << 24) | (Math.round(bb[ii] * ratio) << 16) | (Math.round(gb[ii] * ratio) << 8) | (Math.round(rb[ii] * ratio));
 }
 
 for (let ii = 0; ii < 256; ii ++) {
-  console.log(ii + ') ' + rv[ii] + ', ' + gv[ii] + ', ' + bv[ii]);
+  console.log(ii + ') ' + rv[ii] + ', ' + gv[ii] + ', ' + bv[ii] + ' --> ' + cmap[ii]);
+  // console.log(cmap[ii] + ',');
 }
 
 
