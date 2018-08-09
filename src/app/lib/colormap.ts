@@ -1,375 +1,112 @@
 const KCmapSize = 256;
 
+export enum ColorMapModel {
+  GRAY = 0,
+  RED = 1,
+  JET = 2,
+  REDBLUE = 3.
+
+  // JET,
+  // GREEN,
+  // ,
+  // REDGRAY,
+  // RGB
+}
+
 export interface Color {
   red: number;
   green: number;
   blue: number;
 }
 
-export enum CMapModel {
-  RED,
-  BLACKWHITE,
-  JET,
-  GREEN,
-  REDBLUE,
-  REDGRAY,
-  RGB
-}
-
-export interface ColorPoint {
-  color: Color;
-  pos: number; // Position in % from 0 to 100
-}
-
+// The cmap is an array of of 256 number
+// A number in cmap is 32 bit = 4 byte
+// A number in cmap store an ABGR component (1 byte each => 4 byte)
 export class ColorMap {
 
-  public static create(model: CMapModel): number[] {
+  public static get(model: ColorMapModel): number[] {
 
-    const xxx = [
-      -8192000,
-      -7929856,
-      -7667712,
-      -7405568,
-      -7143424,
-      -6881280,
-      -6619136,
-      -6356992,
-      -6094848,
-      -5832704,
-      -5570560,
-      -5308416,
-      -5046272,
-      -4784128,
-      -4521984,
-      -4259840,
-      -3997696,
-      -3735552,
-      -3473408,
-      -3211264,
-      -2949120,
-      -2686976,
-      -2424832,
-      -2162688,
-      -1900544,
-      -1638400,
-      -1376256,
-      -1114112,
-      -851968,
-      -589824,
-      -327680,
-      -65536,
-      -64512,
-      -63488,
-      -62464,
-      -61440,
-      -60416,
-      -59392,
-      -58368,
-      -57344,
-      -56320,
-      -55296,
-      -54272,
-      -53248,
-      -52224,
-      -51200,
-      -50176,
-      -49152,
-      -48128,
-      -47104,
-      -46080,
-      -45056,
-      -44032,
-      -43008,
-      -41984,
-      -40960,
-      -39936,
-      -38912,
-      -37888,
-      -36864,
-      -35840,
-      -34816,
-      -33792,
-      -32768,
-      -32000,
-      -30976,
-      -29952,
-      -28928,
-      -27904,
-      -26880,
-      -25856,
-      -24832,
-      -23808,
-      -22784,
-      -21760,
-      -20736,
-      -19712,
-      -18688,
-      -17664,
-      -16640,
-      -15616,
-      -14592,
-      -13568,
-      -12544,
-      -11520,
-      -10496,
-      -9472,
-      -8448,
-      -7424,
-      -6400,
-      -5376,
-      -4352,
-      -3328,
-      -2304,
-      -1280,
-      -256,
-      -262396,
-      -524536,
-      -786676,
-      -1048816,
-      -1310956,
-      -1573096,
-      -1835236,
-      -2097376,
-      -2359516,
-      -2621656,
-      -2883796,
-      -3145936,
-      -3408076,
-      -3670216,
-      -3932356,
-      -4194496,
-      -4456636,
-      -4718776,
-      -4980916,
-      -5243056,
-      -5505196,
-      -5767336,
-      -6029476,
-      -6291616,
-      -6553756,
-      -6815896,
-      -7078036,
-      -7340176,
-      -7602316,
-      -7864456,
-      -8126596,
-      -8323200,
-      -8585341,
-      -8847481,
-      -9109621,
-      -9371761,
-      -9633901,
-      -9896041,
-      -10158181,
-      -10420321,
-      -10682461,
-      -10944601,
-      -11206741,
-      -11468881,
-      -11731021,
-      -11993161,
-      -12255301,
-      -12517441,
-      -12779581,
-      -13041721,
-      -13303861,
-      -13566001,
-      -13828141,
-      -14090281,
-      -14352421,
-      -14614561,
-      -14876701,
-      -15138841,
-      -15400981,
-      -15663121,
-      -15925261,
-      -16187401,
-      -16449541,
-      -16711681,
-      -16712705,
-      -16713729,
-      -16714753,
-      -16715777,
-      -16716801,
-      -16717825,
-      -16718849,
-      -16719873,
-      -16720897,
-      -16721921,
-      -16722945,
-      -16723969,
-      -16724993,
-      -16726017,
-      -16727041,
-      -16728065,
-      -16729089,
-      -16730113,
-      -16731137,
-      -16732161,
-      -16733185,
-      -16734209,
-      -16735233,
-      -16736257,
-      -16737281,
-      -16738305,
-      -16739329,
-      -16740353,
-      -16741377,
-      -16742401,
-      -16743425,
-      -16744193,
-      -16745217,
-      -16746241,
-      -16747265,
-      -16748289,
-      -16749313,
-      -16750337,
-      -16751361,
-      -16752385,
-      -16753409,
-      -16754433,
-      -16755457,
-      -16756481,
-      -16757505,
-      -16758529,
-      -16759553,
-      -16760577,
-      -16761601,
-      -16762625,
-      -16763649,
-      -16764673,
-      -16765697,
-      -16766721,
-      -16767745,
-      -16768769,
-      -16769793,
-      -16770817,
-      -16771841,
-      -16772865,
-      -16773889,
-      -16774913,
-      -16775937,
-      -16776961,
-      -16776965,
-      -16776969,
-      -16776973,
-      -16776977,
-      -16776981,
-      -16776985,
-      -16776989,
-      -16776993,
-      -16776997,
-      -16777001,
-      -16777005,
-      -16777009,
-      -16777013,
-      -16777017,
-      -16777021,
-      -16777025,
-      -16777029,
-      -16777033,
-      -16777037,
-      -16777041,
-      -16777045,
-      -16777049,
-      -16777053,
-      -16777057,
-      -16777061,
-      -16777065,
-      -16777069,
-      -16777073,
-      -16777077,
-      -16777081,
-      -16777085,
-      -16777088,
-    ];
-    // return xxx;
-    // SAVED AS ABGR
-    const cmap: number[] = [KCmapSize];
-    if (model === CMapModel.RED) {
-      for (let j = 0; j < KCmapSize; j++) {
-        cmap[j] = 0xff000000 | (j << 8) | (255) ;
-      }
-    } else if (model === CMapModel.BLACKWHITE) {
-      for (let j = 0; j < 256; j++) {
-        cmap[j] = 0xff000000 | (j << 16) | (j << 8) | (j);
-      }
-    } else if (model === CMapModel.JET) {
+    if (model === ColorMapModel.GRAY) {
+      return this.generate([
+        { red: 0, green: 0, blue: 0 },
+        { red: 255, green: 255, blue: 255 }
+      ]);
+    }
 
-      for (let j = 0; j < 32; j++) {
-        cmap[j] = 0xff000000 | ((131 + j * 4) << 16);
-      }
-      for (let j = 32; j < 96; j++) {
-        cmap[j] = 0xff000000 | (((j - 31) * 4 - 1) << 8) | (255 << 16);
-      }
-      for (let j = 96; j < 160; j++) {
-        cmap[j] = 0xff000000 | ((255 - (j - 95) * 4 + 1) << 16) | (255 << 8) | ((j - 95) * 4 - 1) ;
-      }
-      for (let j = 160; j < 224; j++) {
-        cmap[j] = 0xff000000 | ((255 - (j - 159) * 4 + 1) << 8) | (255);
-      }
-      for (let j = 224; j < 256; j++) {
-        cmap[j] = 0xff000000 | (255 - (j - 223) * 4 + 1) ;
-      }
+    if (model === ColorMapModel.JET) {
+      // #00007F, "blue", "#007FFF", "cyan", "#7FFF7F",
+      // "yellow", "#FF7F00", "red", "#7F0000"
+      return this.generate([
+        { red: 0, green: 0, blue: 127 },
+        { red: 0, green: 0, blue: 255 },
+        { red: 0, green: 127, blue: 255 },
+        { red: 0, green: 255, blue: 255 },
+        { red: 127, green: 255, blue: 127 },
+        { red: 255, green: 255, blue: 0 },
+        { red: 255, green: 127, blue: 0 },
+        { red: 255, green: 0, blue: 0 },
+        { red: 127, green: 0, blue: 0 }
+      ]);
+    }
 
-    } else if (model === CMapModel.GREEN) {
-      for (let j = 0; j < 256; j++) {
-        cmap[j] = 0xff000000 + (0 << 16) | (j << 8) | (255 - j);
-      }
-    } else if (model === CMapModel.REDBLUE) {
-      for (let j = 0; j < 128; j++) {
-        cmap[j] = 0xff000000 | ((j * 2) << 16) | ((j * 2) << 8) | 255;
-      }
-      for (let j = 128; j < 256; j++) {
-        cmap[j] = 0xff000000 + (255 << 16) | ((255 - (j - 128) * 2) << 8) | 255 - (j - 128) * 2;
-      }
-      cmap[127] = 0xffffffff;
-    } else if (model === CMapModel.REDGRAY) {
-      for (let j = 0; j < 128; j++) {
-        cmap[j] = 0xff000000 | ((j * 2) << 16) | ((j * 2) << 8) | (j * 2);
-      }
-      for (let j = 128; j < 256; j++) {
-        cmap[j] = 0xff000000 | (255 << 16) | ((255 - (j - 128) * 2) << 8) | 0;
-      }
-      cmap[127] = 0xffffffff;
-    } else if (model === CMapModel.RGB) {
-      for (let j = 0; j < 128; j++) {
-        cmap[j] = 0xff000000 | ((255 - j) << 16) | ((j * 2) << 8) | (j);
-      }
-      for (let j = 128; j < 256; j++) {
-        cmap[j] = 0xff000000 | ((255 - j) << 16) | ((255 - ((j - 128) * 2)) << 8) | (j);
-      }
-    } else {
-      for (let ii = 0; ii < KCmapSize; ii++) {
-        cmap[ii] = 0x00;
+    if (model === ColorMapModel.RED) {
+      return this.generate([
+        { red: 255, green: 0, blue: 0 },
+        { red: 255, green: 255, blue: 0 }
+      ]);
+    }
+
+    if (model === ColorMapModel.REDBLUE) {
+      return this.generate([
+        { red: 255, green: 0, blue: 0 },
+        { red: 255, green: 255, blue: 255 },
+        { red: 8, green: 8, blue: 255 }
+      ]);
+    }
+
+  }
+
+  private static generate(pts: Color[]) {
+
+    const cmap: number[] = [];
+    let ii, jj;
+
+    const nsegment = pts.length - 1;
+    const lsegment = Math.floor((KCmapSize - 1) / nsegment);
+    const nrest = KCmapSize - 1 - lsegment * nsegment;
+    const lensegments = Array(nsegment).fill(lsegment);
+    if (nsegment > 1 && nrest > 0) {
+      let start = Math.round(nsegment / 2) - 1;
+      lensegments[start] += 1;
+      for (jj = 1; jj < nrest; jj++) {
+        start += jj * Math.pow(-1, (jj % 2) + 1);
+        lensegments[start] += 1;
       }
     }
+
+    let dred, dgreen, dblue, inc, incstep;
+    for (ii = 0; ii < nsegment; ii++) {
+      dred = pts[ii + 1].red - pts[ii].red;
+      dgreen = pts[ii + 1].green - pts[ii].green;
+      dblue = pts[ii + 1].blue - pts[ii].blue;
+      incstep = 1.0 / lensegments[ii];
+      for (jj = 0, inc = 0; jj < lensegments[ii]; jj++, inc += incstep) {
+        cmap.push(
+          0xff000000 | // alpha (0xff==(255<<24)
+            ((pts[ii].blue + dblue * inc) << 16) |
+            ((pts[ii].green + dgreen * inc) << 8) |
+            (pts[ii].red + dred * inc)
+        );
+      }
+    }
+    cmap.push(
+      0xff000000 |
+        (pts[nsegment].blue << 16) |
+        (pts[nsegment].green << 8) |
+        pts[nsegment].red
+    );
     return cmap;
   }
 
-  public static custom(pts: ColorPoint[]) {
-    return this.generate(pts[0].color, pts[1].color);
-  }
-
-  private static generate(p1: Color, p2: Color): number[] {
-
-    const step = 1.0 / KCmapSize;
-    const d0 = p2.red - p1.red;
-    const d1 = p2.green - p1.green;
-    const d2 = p2.blue - p1.blue;
-
-    let inc = 0;
-    const cmap: number[] = [KCmapSize];
-    for (let ii = 0; ii < KCmapSize; ii++) {
-      cmap[ii] =
-        0xff000000 | // alpha (0xff==(255<<24)
-        ((p1.blue + d2 * inc) << 16) |
-        ((p1.green + d1 * inc) << 8) |
-        (p1.red + d0 * inc);
-      inc = inc + step;
-    }
-
-    return cmap;
-  }
 
 }

@@ -13,7 +13,7 @@
 //   console.log(buff.readFloatBE(3937 * 200 * 4 + ii * 4));
 // }
 
-import * as fs from 'fs';
+const fs = require('fs');
 
 const data = fs.readFileSync('../../../cmap/jet.raw');
 
@@ -46,7 +46,7 @@ for (let ii = 0; ii < 256; ii ++) {
 }
 
 for (let ii = 0; ii < 256; ii ++) {
-  console.log(ii + ') ' + rv[ii] + ', ' + gv[ii] + ', ' + bv[ii] + ' --> ' + cmap[ii]);
+  console.log(ii + ') ' + bv[ii] + ', ' + gv[ii] + ', ' + rv[ii] + ' --> ' + cmap[ii]);
   // console.log(cmap[ii] + ',');
 }
 

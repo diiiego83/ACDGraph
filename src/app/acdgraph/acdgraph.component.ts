@@ -1,6 +1,6 @@
 import { Component, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 
-import { ColorMap, CMapModel } from '../lib/colormap';
+import { ColorMap, ColorMapModel } from '../lib/colormap';
 
 import { DataReader } from '../lib/datareader';
 import { ACDImage } from '../lib/acdimage';
@@ -11,7 +11,6 @@ import { ACDImage } from '../lib/acdimage';
   styleUrls: ['./acdgraph.component.css']
 })
 export class AcdgraphComponent implements AfterViewInit {
-
   @ViewChild('canvas') public canvas: ElementRef;
   @ViewChild('daddy') public daddy: ElementRef;
 
@@ -40,12 +39,20 @@ export class AcdgraphComponent implements AfterViewInit {
 
     // STOP ON DESTROY
     setInterval(() => {
-      if (this._csdaddy.clientHeight !== this._cs.height + this._borderw * 2 ||
-      this._csdaddy.clientWidth !== this._cs.width + this._borderw * 2) {
+      if (
+        this._csdaddy.clientHeight !== this._cs.height + this._borderw * 2 ||
+        this._csdaddy.clientWidth !== this._cs.width + this._borderw * 2
+      ) {
         this._cs.height = this._csdaddy.clientHeight - this._borderw * 2;
         this._cs.width = this._csdaddy.clientWidth - this._borderw * 2;
         if (this._img) {
-          this._cx.drawImage(this._img.getImage(), 0, 0, this._cs.width * this._zoom, this._cs.height * this._zoom);
+          this._cx.drawImage(
+            this._img.getImage(),
+            0,
+            0,
+            this._cs.width * this._zoom,
+            this._cs.height * this._zoom
+          );
         }
       }
     }, 10);
@@ -86,7 +93,7 @@ export class AcdgraphComponent implements AfterViewInit {
 
   private render() {
     this.clear();
-    const cmap = ColorMap.create(CMapModel.RED);
+    const cmap = ColorMap.get(ColorMapModel.REDBLUE);
     this._img.produceImage(cmap).then(image => {
       this._cx.drawImage(image, 0, 0, this._cs.width, this._cs.height);
     });
