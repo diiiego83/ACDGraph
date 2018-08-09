@@ -2,15 +2,15 @@ const KCmapSize = 256;
 
 export enum ColorMapModel {
   GRAY = 0,
-  RED = 1,
-  JET = 2,
-  REDBLUE = 3.
-
-  // JET,
-  // GREEN,
-  // ,
-  // REDGRAY,
-  // RGB
+  JET = 1,
+  HSV = 2,
+  HOT = 3,
+  COOL = 4,
+  SPRING = 5,
+  SUMMER = 6,
+  AUTUMN = 7,
+  WINTER = 8,
+  REDWHITEBLUE = 9,
 }
 
 export interface Color {
@@ -26,6 +26,7 @@ export class ColorMap {
 
   public static get(model: ColorMapModel): number[] {
 
+    // GRAY
     if (model === ColorMapModel.GRAY) {
       return this.generate([
         { red: 0, green: 0, blue: 0 },
@@ -33,9 +34,8 @@ export class ColorMap {
       ]);
     }
 
+    // JET
     if (model === ColorMapModel.JET) {
-      // #00007F, "blue", "#007FFF", "cyan", "#7FFF7F",
-      // "yellow", "#FF7F00", "red", "#7F0000"
       return this.generate([
         { red: 0, green: 0, blue: 127 },
         { red: 0, green: 0, blue: 255 },
@@ -49,25 +49,81 @@ export class ColorMap {
       ]);
     }
 
-    if (model === ColorMapModel.RED) {
+    // REDWITHEBLUE
+    if (model === ColorMapModel.REDWHITEBLUE) {
       return this.generate([
         { red: 255, green: 0, blue: 0 },
+        { red: 255, green: 255, blue: 255 },
+        { red: 0, green: 0, blue: 255 }
+      ]);
+    }
+
+    // SPRING
+    if (model === ColorMapModel.SPRING) {
+      return this.generate([
+        { red: 255, green: 0, blue: 255 },
         { red: 255, green: 255, blue: 0 }
       ]);
     }
 
-    if (model === ColorMapModel.REDBLUE) {
+    // SUMMER
+    if (model === ColorMapModel.SUMMER) {
+      return this.generate([
+        { red: 0, green: 255, blue: 102 },
+        { red: 255, green: 255, blue: 102 }
+      ]);
+    }
+
+    // AUTUMN
+    if (model === ColorMapModel.AUTUMN) {
+      return this.generate([
+        { red: 255, green: 127, blue: 0 },
+        { red: 255, green: 255, blue: 0 }
+      ]);
+    }
+
+    // WINTER
+    if (model === ColorMapModel.WINTER) {
+      return this.generate([
+        { red: 0, green: 0, blue: 255 },
+        { red: 0, green: 255, blue: 127 }
+      ]);
+    }
+
+    // HOT
+    if (model === ColorMapModel.HOT) {
+      return this.generate([
+        { red: 0, green: 0, blue: 0 },
+        { red: 255, green: 0, blue: 0 },
+        { red: 255, green: 255, blue: 0 },
+        { red: 255, green: 255, blue: 255 }
+      ]);
+    }
+
+    // COOL
+    if (model === ColorMapModel.COOL) {
+      return this.generate([
+        { red: 0, green: 255, blue: 255 },
+        { red: 255, green: 0, blue: 255 }
+      ]);
+    }
+
+    // HVS
+    if (model === ColorMapModel.HSV) {
       return this.generate([
         { red: 255, green: 0, blue: 0 },
-        { red: 255, green: 255, blue: 255 },
-        { red: 8, green: 8, blue: 255 }
+        { red: 255, green: 255, blue: 0 },
+        { red: 0, green: 255, blue: 0 },
+        { red: 0, green: 255, blue: 255 },
+        { red: 0, green: 0, blue: 255 },
+        { red: 255, green: 0, blue: 255 },
+        { red: 255, green: 0, blue: 0 }
       ]);
     }
 
   }
 
   private static generate(pts: Color[]) {
-
     const cmap: number[] = [];
     let ii, jj;
 
@@ -107,6 +163,4 @@ export class ColorMap {
     );
     return cmap;
   }
-
-
 }
