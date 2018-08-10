@@ -21,18 +21,20 @@
   </div>
 </div> -->
 
-<div style="height: 100%; display: flex; flex-direction: column;">
-  <div style="height: 40px; background-color: #888888">
+<div style="height: 100%; display: flex; flex-direction: column; background-color: #555555">
+  <div style="height: 40px; background-color: #ffffff">
       <button (click)="test()" style="margin: 10px">TEST</button>
-      <button (click)="clearALL()" style="margin: 10px">CLEAR</button>
-      <button (click)="plus()" style="margin: 10px">PLUS</button>
-      <button (click)="minus()" style="margin: 10px">MINUS</button>
-      <button (click)="reset()" style="margin: 10px">RESET</button>
+      <!-- <button (click)="clearALL()" style="margin: 10px">CLEAR</button> -->
+      <button (click)="zoom_in()" style="margin: 10px">PLUS</button>
+      <button (click)="zoom_out()" style="margin: 10px">MINUS</button>
+      <button (click)="zoom_reset()" style="margin: 10px">RESET</button>
   </div>
-  <div #daddy (mousewheel)='handleMouseWheel($event)' style="display: flex; flex-direction: row; flex-grow: 1; margin:50px;">
+  <div #daddy style="display: flex; flex-direction: row; flex-grow: 1; margin:50px;">
     <canvas style="flex-grow: 1" #canvas
             [ngStyle]="style"
-            width="0" height="0">
+            width="0" height="0"
+            (contextmenu)="context($event)"
+            (mousewheel)='handleMouseWheel($event)'>
     </canvas>
   </div>
 </div>

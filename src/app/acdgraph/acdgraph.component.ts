@@ -1,7 +1,5 @@
 import { Component, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
-
 import { ColorMap, ColorMapModel } from '../lib/colormap';
-
 import { DataReader } from '../lib/datareader';
 import { ACDImage } from '../lib/acdimage';
 
@@ -11,72 +9,114 @@ import { ACDImage } from '../lib/acdimage';
   styleUrls: ['./acdgraph.component.css']
 })
 export class AcdgraphComponent implements AfterViewInit {
-  @ViewChild('canvas') public canvas: ElementRef;
-  @ViewChild('daddy') public daddy: ElementRef;
+  @ViewChild('canvas') public eref_canvas: ElementRef;
+  @ViewChild('daddy') public eref_canvas_container: ElementRef;
 
-  private _csdaddy: HTMLDivElement;
-  private _cs: HTMLCanvasElement;
-  private _cx: CanvasRenderingContext2D;
-  private _zoom = 1.0;
+  private canvas: HTMLCanvasElement;
+  private canvas_cx: CanvasRenderingContext2D;
+  private canvas_container: HTMLDivElement;
 
-  private _img: ACDImage;
+  private graph_left = 0;   // graph left pos
+  private graph_top = 0;    // graph top pos
+  private graph_width = 0;  // graph width
+  private graph_height = 0; // graph heigth
 
-  public _borderw = 1;
-
-  // private xleftView = 0;
-  // private ytopView = 0;
-  // private widthViewOriginal = 1.0;           // actual width and height of zoomed and panned display
-  // private heightViewOriginal = 1.0;
-  // private widthView = this.widthViewOriginal;           // actual width and height of zoomed and panned display
-  // private heightView = this.heightViewOriginal;
-
-  private x0 = 0.0;
-  private y0 = 0.0;
-  private w = 1.0;
-  private h = 1.0;
+  private acdimage: ACDImage;
+  public borderw = 1;
 
   public style = {
-    'border-width.px': this._borderw,
+    'border-width.px': this.borderw,
     'border-style': 'solid',
     'border-color': '#333333',
     'background-color': '#ffffff'
   };
 
   public ngAfterViewInit() {
-    this._cs = this.canvas.nativeElement;
-    this._cx = this._cs.getContext('2d');
-    this._csdaddy = this.daddy.nativeElement;
-    this._cs.height = this._csdaddy.clientHeight - this._borderw * 2;
-    this._cs.width = this._csdaddy.clientWidth - this._borderw * 2;
+
+    this.canvas = this.eref_canvas.nativeElement;
+    this.canvas_cx = this.canvas.getContext('2d');
+    this.canvas_container = this.eref_canvas_container.nativeElement;
+
+    this.canvas.height = this.canvas_container.clientHeight - this.borderw * 2;
+    this.canvas.width = this.canvas_container.clientWidth - this.borderw * 2;
+
+    this.graph_width = this.canvas.width;
+    this.graph_height = this.canvas.height;
 
     // STOP ON DESTROY
     setInterval(() => {
-      if (
-        this._csdaddy.clientHeight !== this._cs.height + this._borderw * 2 ||
-        this._csdaddy.clientWidth !== this._cs.width + this._borderw * 2
-      ) {
-        this._cs.height = this._csdaddy.clientHeight - this._borderw * 2;
-        this._cs.width = this._csdaddy.clientWidth - this._borderw * 2;
-        if (this._img) {
-          this._cx.drawImage(
-            this._img.getImage(),
-            0,
-            0,
-            this._cs.width * this._zoom,
-            this._cs.height * this._zoom
-          );
+      if (this.canvas_container.clientHeight !== this.canvas.height + this.borderw * 2 ||
+        this.canvas_container.clientWidth !== this.canvas.width + this.borderw * 2) {
+
+        if (this.acdimage) {
+          const ratioh = this.canvas_container.clientHeight / this.canvas.height;
+          const ratiow = this.canvas_container.clientWidth / this.canvas.width;
+          this.canvas.height = this.canvas_container.clientHeight - this.borderw * 2;
+          this.canvas.width = this.canvas_container.clientWidth - this.borderw * 2;
+          this.graph_width = this.graph_width * ratiow;
+          this.graph_height = this.graph_height * ratioh;
+          this.graph_left = this.graph_left * ratiow;
+          this.graph_top = this.graph_top * ratioh;
+          this.draw();
         }
+
       }
     }, 10);
   }
 
-  private clearALL() {
-    this._cx.clearRect(0, 0, this._cs.width, this._cs.height);
-    this._img = undefined;
+  private draw() {
+    this.canvas_cx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.canvas_cx.drawImage(this.acdimage.getImage(), this.graph_left, this.graph_top, this.graph_width, this.graph_height);
   }
 
-  private clear() {
-    this._cx.clearRect(0, 0, this._cs.width, this._cs.height);
+  private render() {
+    const cmap = ColorMap.get(ColorMapModel.JET);
+    this.acdimage.produceImage(cmap).then(image => {
+      this.draw();
+    });
+  }
+
+  public handleMouseWheel(event: WheelEvent) {
+    this.zoom(event.wheelDelta > 0 ? 1.05 : 0.95);
+  }
+
+  private zoom_in() {
+    this.zoom(1.2);
+  }
+
+  private zoom_out() {
+    this.zoom(0.8);
+  }
+
+  private zoom(inc: number) {
+    if (!this.acdimage) { return; }
+    const graph_new_width = Math.max(this.graph_width * inc, this.canvas.width);
+    const graph_new_height = Math.max(this.graph_height * inc, this.canvas.height);
+    const dx = Math.abs(graph_new_width - this.graph_width) / 2.0;
+    const dy = Math.abs(graph_new_height - this.graph_height) / 2.0;
+    if (inc > 1.0) {
+      this.graph_left = this.graph_left - dx;
+      this.graph_top = this.graph_top  - dy;
+    } else {
+      this.graph_left = this.graph_left + dx;
+      this.graph_top = this.graph_top + dy;
+    }
+    this.graph_width = graph_new_width;
+    this.graph_height = graph_new_height;
+    this.draw();
+  }
+
+  private zoom_reset() {
+    if (!this.acdimage) { return; }
+    this.graph_left = 0;
+    this.graph_top = 0;
+    this.graph_width = this.canvas.width;
+    this.graph_height = this.canvas.height;
+    this.draw();
+  }
+
+  private context(event) {
+    event.preventDefault();
   }
 
   private test() {
@@ -86,7 +126,7 @@ export class AcdgraphComponent implements AfterViewInit {
     oReq.onload = oEvent => {
       const arrayBuffer = oReq.response; // Note: not oReq.responseText
       if (arrayBuffer) {
-        this._img = new ACDImage(DataReader.readfloat32(arrayBuffer), 563, 3937);
+        this.acdimage = new ACDImage(DataReader.readfloat32(arrayBuffer), 563, 3937);
         this.render();
       }
     };
@@ -97,113 +137,17 @@ export class AcdgraphComponent implements AfterViewInit {
     const input = event.target;
     const reader = new FileReader();
     reader.onload = () => {
-      this._img = new ACDImage(DataReader.readfloat32(reader.result), 563, 3937);
+      this.acdimage = new ACDImage(DataReader.readfloat32(reader.result), 563, 3937);
       this.render();
     };
     reader.readAsArrayBuffer(input.files[0]);
   }
 
-  public handleMouseWheel(event: WheelEvent) {
 
-    // let x = this.w / 2 + this.x0;  // View coordinates
-    // let y = this.h / 2 + this.y0;
 
-    // const scale =  (event.wheelDelta < 0 || event.detail > 0) ? 1.1 : 0.9;
-    // this.w *= scale;
-    // this.h *= scale;
 
-    // if (event.wheelDelta < 0) {
-    //   this.w += 0.5;
-    //   this.h += 0.5;
-    // } else {
-    //   this.w -= 0.5;
-    //   this.h -= 0.5;
-    // }
 
-    // if (this.w > 1.0 || this.h > 1.0) {
-      // this.w = 1.0;
-      // this.h = 1.0;
-      // x = this.w / 2;
-      // y = this.h / 2;
-    // }
 
-    // scale about center of view, rather than mouse position. This is different than dblclick behavior.
-    // this.x0 = x - this.w / 2;
-    // this.y0 = y - this.h / 2;
 
-    if (event.wheelDelta > 0) {
-      this.x0 += 0.1;
-      this.y0 += 0.05;
-    } else {
-      this.x0 -= 0.1;
-      this.y0 -= 0.05;
-    }
-    // this.y0 += 0.1;
 
-    this.clear();
-    this._cx.setTransform(1, 0, 0, 1, 0, 0);
-    this._cx.scale(this._cs.width, this._cs.height);
-    // this._cx.translate(-this.y0, -this.y0);
-    this._cx.drawImage(this._img.getImage(), 0 - this.y0, 0 -  this.y0, 1 + this.x0, 1 + this.x0);
-  }
-
-  private render() {
-    this.clear();
-    const cmap = ColorMap.get(ColorMapModel.JET);
-    this._img.produceImage(cmap).then(image => {
-      // this._cx.setTransform(1, 0, 0, 1, 0, 0);
-      // this._cx.scale(this._cs.width / this.w, this._cs.height / this.w);
-      // this._cx.translate(-this.x0, -this.y0);
-      // this._cx.drawImage(image, 0, 0, this.w, this.h);
-      this._cx.setTransform(1, 0, 0, 1, 0, 0);
-      this._cx.scale(this._cs.width, this._cs.height);
-      // this._cx.translate(-this.y0, -this.y0);
-      this._cx.drawImage(this._img.getImage(), 0 - this.y0, 0 - this.y0, 1 + this.x0, 1 + this.x0);
-    });
-  }
-
-  private plus() {
-    // this._zoom += 0.05;
-    // this._cx.clearRect(0, 0, this._cs.width, this._cs.height);
-    // this._cx.drawImage(
-    //   this._img.getImage(),
-    //   0,
-    //   0,
-    //   this._cs.width * this._zoom,
-    //   this._cs.height * this._zoom
-    // );
-    this.x0 += 0.2;
-    this.y0 += 0.1;
-    this.clear();
-    this._cx.setTransform(1, 0, 0, 1, 0, 0);
-    this._cx.scale(this._cs.width, this._cs.height);
-    // this._cx.translate(-this.y0, -this.y0);
-    this._cx.drawImage(this._img.getImage(), 0 - this.y0, 0 -  this.y0, 1 + this.x0, 1 + this.x0);
-  }
-
-  private minus() {
-    // this._zoom -= 0.05;
-    // this._cx.clearRect(0, 0, this._cs.width, this._cs.height);
-    // this._cx.drawImage(
-    //   this._img.getImage(),
-    //   0,
-    //   0,
-    //   this._cs.width * this._zoom,
-    //   this._cs.height * this._zoom
-    // );
-    this.x0 -= 0.2;
-    this.y0 -= 0.1;
-    this.clear();
-    this._cx.setTransform(1, 0, 0, 1, 0, 0);
-    this._cx.scale(this._cs.width, this._cs.height);
-    // this._cx.translate(-this.y0, -this.y0);
-    this._cx.drawImage(this._img.getImage(), 0 - this.y0, 0 -  this.y0, 1 + this.x0, 1 + this.x0);
-  }
-
-  private reset() {
-    // save original image measure
-    this._zoom = 1.0;
-    this._cx.clearRect(0, 0, this._cs.width, this._cs.height);
-    this._cx.drawImage(this._img.getImage(), 0, 0, this._cs.width, this._cs.height);
-  }
 }

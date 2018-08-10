@@ -45,11 +45,11 @@ var vpy = 0
 var vpw = window.innerWidth
 var vph = window.innerHeight
 
-var orig_width = 4000
-var orig_height = 4000
+var orig_width = window.innerWidth
+var orig_height = window.innerHeight
 
-var width = 4000
-var height = 4000
+var width = window.innerWidth
+var height = window.innerHeight
 
 $(window).on('resize', function () {
   $(canvas).prop({
@@ -62,13 +62,14 @@ $(canvas).on('wheel', function (ev) {
   ev.preventDefault() // for stackoverflow
 
   var step
+  var inc = 0.1
 
   if (ev.originalEvent.wheelDelta) {
-    step = (ev.originalEvent.wheelDelta > 0) ? 0.05 : -0.05
+    step = (ev.originalEvent.wheelDelta > 0) ? inc : -1 * inc
   }
 
   if (ev.originalEvent.deltaY) {
-    step = (ev.originalEvent.deltaY > 0) ? 0.05 : -0.05
+    step = (ev.originalEvent.deltaY > 0) ? inc : -1 * inc
   }
 
   if (!step) return false // yea..
@@ -86,8 +87,12 @@ $(canvas).on('wheel', function (ev) {
   }
 
   // zoom center point
-  var targetX = ev.originalEvent.clientX || (vpw / 2)
-  var targetY = ev.originalEvent.clientY || (vph / 2)
+  // (This scroll center on the mouse)
+  // var targetX = ev.originalEvent.clientX || (vpw / 2)
+  // var targetY = ev.originalEvent.clientY || (vph / 2)
+  // (This kee alwasy the center)
+  var targetX = vpw / 2
+  var targetY = vph / 2
 
   // percentages from side
   var pX = ((vpx * -1) + targetX) * 100 / width
@@ -121,56 +126,57 @@ $(canvas).on('wheel', function (ev) {
 
   vpx = x * -1
   vpy = y * -1
+  draw()
 })
 
-var is_down, is_drag, last_drag
+// var is_down, is_drag, last_drag
 
-$(canvas).on('mousedown', function (ev) {
-  is_down = true
-  is_drag = false
-  last_drag = { x: ev.clientX, y: ev.clientY }
-})
+// $(canvas).on('mousedown', function (ev) {
+//   is_down = true
+//   is_drag = false
+//   last_drag = { x: ev.clientX, y: ev.clientY }
+// })
 
-$(canvas).on('mousemove', function (ev) {
-  is_drag = true
+// $(canvas).on('mousemove', function (ev) {
+//   is_drag = true
 
-  if (is_down) {
-    var x = vpx - (last_drag.x - ev.clientX)
-    var y = vpy - (last_drag.y - ev.clientY)
+//   if (is_down) {
+//     var x = vpx - (last_drag.x - ev.clientX)
+//     var y = vpy - (last_drag.y - ev.clientY)
 
-    if (x <= 0 && vpw < x + width) {
-      vpx = x
-    }
+//     if (x <= 0 && vpw < x + width) {
+//       vpx = x
+//     }
 
-    if (y <= 0 && vph < y + height) {
-      vpy = y
-    }
+//     if (y <= 0 && vph < y + height) {
+//       vpy = y
+//     }
 
-    last_drag = { x: ev.clientX, y: ev.clientY }
-  }
-})
+//     last_drag = { x: ev.clientX, y: ev.clientY }
+//   }
+// })
 
-$(canvas).on('mouseup', function (ev) {
-  is_down = false
-  last_drag = null
+// $(canvas).on('mouseup', function (ev) {
+//   is_down = false
+//   last_drag = null
 
-  var was_click = !is_drag
-  is_drag = false
+//   var was_click = !is_drag
+//   is_drag = false
 
-  if (was_click) {
+//   if (was_click) {
 
-  }
-})
+//   }
+// })
 
-$(canvas).css({ position: 'absolute', top: 0, left: 0 }).appendTo(document.body)
+$(canvas).css({ position: 'absolute', top: 0, left: 0, width: 1000, height: 1000 }).appendTo(document.body)
 
-function animate () {
-  window.requestAnimationFrame(animate)
+function draw() {
+  // window.requestAnimationFrame(animate)
 
   canvasContext.clearRect(0, 0, canvas.width, canvas.height)
 
-  canvasContext.lineWidth = 1
-  canvasContext.strokeStyle = '#ccc'
+  canvasContext.lineWidth = 2
+  canvasContext.strokeStyle = '#000000'
 
   var step = 100 * ratio
 
@@ -202,9 +208,9 @@ function animate () {
   canvasContext.restore()
 }
 
-animate()
+draw()
 })
   </script>
-	<canvas class="main"></canvas>
+	<canvas class="main" style="background-color: #cccccc;"></canvas>
 </body>
 </html>
