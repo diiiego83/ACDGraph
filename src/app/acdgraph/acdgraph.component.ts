@@ -23,6 +23,18 @@ export class AcdgraphComponent implements AfterViewInit {
 
   public _borderw = 1;
 
+  // private xleftView = 0;
+  // private ytopView = 0;
+  // private widthViewOriginal = 1.0;           // actual width and height of zoomed and panned display
+  // private heightViewOriginal = 1.0;
+  // private widthView = this.widthViewOriginal;           // actual width and height of zoomed and panned display
+  // private heightView = this.heightViewOriginal;
+
+  private x0 = 0.0;
+  private y0 = 0.0;
+  private w = 1.0;
+  private h = 1.0;
+
   public style = {
     'border-width.px': this._borderw,
     'border-style': 'solid',
@@ -91,36 +103,101 @@ export class AcdgraphComponent implements AfterViewInit {
     reader.readAsArrayBuffer(input.files[0]);
   }
 
+  public handleMouseWheel(event: WheelEvent) {
+
+    // let x = this.w / 2 + this.x0;  // View coordinates
+    // let y = this.h / 2 + this.y0;
+
+    // const scale =  (event.wheelDelta < 0 || event.detail > 0) ? 1.1 : 0.9;
+    // this.w *= scale;
+    // this.h *= scale;
+
+    // if (event.wheelDelta < 0) {
+    //   this.w += 0.5;
+    //   this.h += 0.5;
+    // } else {
+    //   this.w -= 0.5;
+    //   this.h -= 0.5;
+    // }
+
+    // if (this.w > 1.0 || this.h > 1.0) {
+      // this.w = 1.0;
+      // this.h = 1.0;
+      // x = this.w / 2;
+      // y = this.h / 2;
+    // }
+
+    // scale about center of view, rather than mouse position. This is different than dblclick behavior.
+    // this.x0 = x - this.w / 2;
+    // this.y0 = y - this.h / 2;
+
+    if (event.wheelDelta > 0) {
+      this.x0 += 0.1;
+      this.y0 += 0.05;
+    } else {
+      this.x0 -= 0.1;
+      this.y0 -= 0.05;
+    }
+    // this.y0 += 0.1;
+
+    this.clear();
+    this._cx.setTransform(1, 0, 0, 1, 0, 0);
+    this._cx.scale(this._cs.width, this._cs.height);
+    // this._cx.translate(-this.y0, -this.y0);
+    this._cx.drawImage(this._img.getImage(), 0 - this.y0, 0 -  this.y0, 1 + this.x0, 1 + this.x0);
+  }
+
   private render() {
     this.clear();
     const cmap = ColorMap.get(ColorMapModel.JET);
     this._img.produceImage(cmap).then(image => {
-      this._cx.drawImage(image, 0, 0, this._cs.width, this._cs.height);
+      // this._cx.setTransform(1, 0, 0, 1, 0, 0);
+      // this._cx.scale(this._cs.width / this.w, this._cs.height / this.w);
+      // this._cx.translate(-this.x0, -this.y0);
+      // this._cx.drawImage(image, 0, 0, this.w, this.h);
+      this._cx.setTransform(1, 0, 0, 1, 0, 0);
+      this._cx.scale(this._cs.width, this._cs.height);
+      // this._cx.translate(-this.y0, -this.y0);
+      this._cx.drawImage(this._img.getImage(), 0 - this.y0, 0 - this.y0, 1 + this.x0, 1 + this.x0);
     });
   }
 
   private plus() {
-    this._zoom += 0.05;
-    this._cx.clearRect(0, 0, this._cs.width, this._cs.height);
-    this._cx.drawImage(
-      this._img.getImage(),
-      0,
-      0,
-      this._cs.width * this._zoom,
-      this._cs.height * this._zoom
-    );
+    // this._zoom += 0.05;
+    // this._cx.clearRect(0, 0, this._cs.width, this._cs.height);
+    // this._cx.drawImage(
+    //   this._img.getImage(),
+    //   0,
+    //   0,
+    //   this._cs.width * this._zoom,
+    //   this._cs.height * this._zoom
+    // );
+    this.x0 += 0.2;
+    this.y0 += 0.1;
+    this.clear();
+    this._cx.setTransform(1, 0, 0, 1, 0, 0);
+    this._cx.scale(this._cs.width, this._cs.height);
+    // this._cx.translate(-this.y0, -this.y0);
+    this._cx.drawImage(this._img.getImage(), 0 - this.y0, 0 -  this.y0, 1 + this.x0, 1 + this.x0);
   }
 
   private minus() {
-    this._zoom -= 0.05;
-    this._cx.clearRect(0, 0, this._cs.width, this._cs.height);
-    this._cx.drawImage(
-      this._img.getImage(),
-      0,
-      0,
-      this._cs.width * this._zoom,
-      this._cs.height * this._zoom
-    );
+    // this._zoom -= 0.05;
+    // this._cx.clearRect(0, 0, this._cs.width, this._cs.height);
+    // this._cx.drawImage(
+    //   this._img.getImage(),
+    //   0,
+    //   0,
+    //   this._cs.width * this._zoom,
+    //   this._cs.height * this._zoom
+    // );
+    this.x0 -= 0.2;
+    this.y0 -= 0.1;
+    this.clear();
+    this._cx.setTransform(1, 0, 0, 1, 0, 0);
+    this._cx.scale(this._cs.width, this._cs.height);
+    // this._cx.translate(-this.y0, -this.y0);
+    this._cx.drawImage(this._img.getImage(), 0 - this.y0, 0 -  this.y0, 1 + this.x0, 1 + this.x0);
   }
 
   private reset() {

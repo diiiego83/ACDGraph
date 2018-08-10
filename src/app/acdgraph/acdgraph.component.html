@@ -29,7 +29,7 @@
       <button (click)="minus()" style="margin: 10px">MINUS</button>
       <button (click)="reset()" style="margin: 10px">RESET</button>
   </div>
-  <div #daddy style="display: flex; flex-direction: row; flex-grow: 1; margin:50px;">
+  <div #daddy (mousewheel)='handleMouseWheel($event)' style="display: flex; flex-direction: row; flex-grow: 1; margin:50px;">
     <canvas style="flex-grow: 1" #canvas
             [ngStyle]="style"
             width="0" height="0">
