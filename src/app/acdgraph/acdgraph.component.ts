@@ -64,6 +64,8 @@ export class AcdgraphComponent implements AfterViewInit {
         } else {
           this.canvas.height = this.canvas_container.clientHeight - this.borderw * 2;
           this.canvas.width = this.canvas_container.clientWidth - this.borderw * 2;
+          this.graph.width = this.canvas.width;
+          this.graph.height = this.canvas.height;
         }
 
       }
