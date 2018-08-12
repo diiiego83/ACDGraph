@@ -16,10 +16,13 @@ export class AcdgraphComponent implements AfterViewInit {
   private canvas_cx: CanvasRenderingContext2D;
   private canvas_container: HTMLDivElement;
 
-  private graph_left = 0;   // graph left pos
-  private graph_top = 0;    // graph top pos
-  private graph_width = 0;  // graph width
-  private graph_height = 0; // graph heigth
+  private graph = { left: 0, top: 0, width: 0, height: 0, ratio: 1.0 };
+  private mouse = {
+    isdown: false,
+    ispan: false,
+    lastpan: { x: 0, y: 0 },
+    clickt: Date.now()
+  };
 
   private acdimage: ACDImage;
   public borderw = 1;
@@ -40,8 +43,8 @@ export class AcdgraphComponent implements AfterViewInit {
     this.canvas.height = this.canvas_container.clientHeight - this.borderw * 2;
     this.canvas.width = this.canvas_container.clientWidth - this.borderw * 2;
 
-    this.graph_width = this.canvas.width;
-    this.graph_height = this.canvas.height;
+    this.graph.width = this.canvas.width;
+    this.graph.height = this.canvas.height;
 
     // STOP ON DESTROY
     setInterval(() => {
@@ -49,15 +52,18 @@ export class AcdgraphComponent implements AfterViewInit {
         this.canvas_container.clientWidth !== this.canvas.width + this.borderw * 2) {
 
         if (this.acdimage) {
-          const ratioh = this.canvas_container.clientHeight / this.canvas.height;
-          const ratiow = this.canvas_container.clientWidth / this.canvas.width;
+          const ratioh = (this.canvas_container.clientHeight - this.borderw * 2) / this.canvas.height;
+          const ratiow = (this.canvas_container.clientWidth - this.borderw * 2) / this.canvas.width;
           this.canvas.height = this.canvas_container.clientHeight - this.borderw * 2;
           this.canvas.width = this.canvas_container.clientWidth - this.borderw * 2;
-          this.graph_width = this.graph_width * ratiow;
-          this.graph_height = this.graph_height * ratioh;
-          this.graph_left = this.graph_left * ratiow;
-          this.graph_top = this.graph_top * ratioh;
+          this.graph.width = this.graph.width * ratiow;
+          this.graph.height = this.graph.height * ratioh;
+          this.graph.left = this.graph.left * ratiow;
+          this.graph.top = this.graph.top * ratioh;
           this.draw();
+        } else {
+          this.canvas.height = this.canvas_container.clientHeight - this.borderw * 2;
+          this.canvas.width = this.canvas_container.clientWidth - this.borderw * 2;
         }
 
       }
@@ -66,7 +72,7 @@ export class AcdgraphComponent implements AfterViewInit {
 
   private draw() {
     this.canvas_cx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this.canvas_cx.drawImage(this.acdimage.getImage(), this.graph_left, this.graph_top, this.graph_width, this.graph_height);
+    this.canvas_cx.drawImage(this.acdimage.getImage(), this.graph.left, this.graph.top, this.graph.width, this.graph.height);
   }
 
   private render() {
@@ -76,43 +82,111 @@ export class AcdgraphComponent implements AfterViewInit {
     });
   }
 
-  public handleMouseWheel(event: WheelEvent) {
-    this.zoom(event.wheelDelta > 0 ? 1.05 : 0.95);
-  }
-
   private zoom_in() {
-    this.zoom(1.2);
+    this.zoom(Math.max((this.graph.ratio - 1.0) * 0.2, 0.2));
   }
 
   private zoom_out() {
-    this.zoom(0.8);
+    this.zoom(-1 * Math.max((this.graph.ratio - 1.0) * 0.2, 0.2));
   }
 
-  private zoom(inc: number) {
+  private zoom(inc: number, xCenterPos: number = this.canvas.width / 2, yCenterPos: number = this.canvas.height / 2) {
+
     if (!this.acdimage) { return; }
-    const graph_new_width = Math.max(this.graph_width * inc, this.canvas.width);
-    const graph_new_height = Math.max(this.graph_height * inc, this.canvas.height);
-    const dx = Math.abs(graph_new_width - this.graph_width) / 2.0;
-    const dy = Math.abs(graph_new_height - this.graph_height) / 2.0;
-    if (inc > 1.0) {
-      this.graph_left = this.graph_left - dx;
-      this.graph_top = this.graph_top  - dy;
-    } else {
-      this.graph_left = this.graph_left + dx;
-      this.graph_top = this.graph_top + dy;
+
+    this.graph.ratio = Math.max(1.0, this.graph.ratio + inc);
+
+    // percentages from side
+    const pX = ((this.graph.left * -1) + xCenterPos) * 100 / this.graph.width;
+    const pY = ((this.graph.top * -1) + yCenterPos) * 100 / this.graph.height;
+
+    this.graph.width = this.canvas.width * this.graph.ratio;
+    this.graph.height = this.canvas.height * this.graph.ratio;
+
+    // translate view back to center point
+    let x = ((this.graph.width * pX / 100) - xCenterPos);
+    let y = ((this.graph.height * pY / 100) - yCenterPos);
+
+    // don't let viewport go over edges
+    if (x < 0) { x = 0; }
+    if (x + this.canvas.width > this.graph.width) {
+      x = this.graph.width - this.canvas.width;
     }
-    this.graph_width = graph_new_width;
-    this.graph_height = graph_new_height;
+
+    if (y < 0) { y = 0; }
+    if (y + this.canvas.height > this.graph.height) {
+      y = this.graph.height - this.canvas.height;
+    }
+
+    this.graph.left = x * -1;
+    this.graph.top = y * -1;
+
     this.draw();
   }
 
   private zoom_reset() {
     if (!this.acdimage) { return; }
-    this.graph_left = 0;
-    this.graph_top = 0;
-    this.graph_width = this.canvas.width;
-    this.graph_height = this.canvas.height;
+    this.graph.ratio = 1.0;
+    this.graph.left = 0;
+    this.graph.top = 0;
+    this.graph.width = this.canvas_container.clientWidth - this.borderw * 2;
+    this.graph.height = this.canvas_container.clientHeight - this.borderw * 2;
     this.draw();
+  }
+
+  public handleMouseWheel(event: WheelEvent) {
+    event.preventDefault();
+    if (!event.wheelDelta) { return false; }
+    const inc = Math.max((this.graph.ratio - 1.0) * 0.05, 0.05); // 5% of current size
+    this.zoom((event.wheelDelta > 0) ? inc : -1 * inc, event.clientX, event.clientY);
+  }
+
+  private mousedown(event: MouseEvent) {
+    if (event.button === 2) {
+      if (Date.now() - this.mouse.clickt < 300) {
+        this.zoom_reset();
+      }
+      this.mouse.clickt = Date.now();
+    } else if (event.button === 0) {
+      this.mouse.isdown = true;
+      this.mouse.ispan = false;
+      this.mouse.lastpan = { x: event.clientX, y: event.clientY };
+      this.canvas.style.cursor = 'grabbing';
+    }
+  }
+
+  private mousemove(event: MouseEvent) {
+    if (this.mouse.isdown) {
+        this.mouse.ispan = true;
+        const new_left = this.graph.left - (this.mouse.lastpan.x - event.clientX);
+        const new_top = this.graph.top - (this.mouse.lastpan.y - event.clientY);
+        if (new_left <= 0 && (new_left + this.graph.width) > this.canvas.width) {
+          this.graph.left = new_left;
+        }
+        if (new_top <= 0 && (new_top + this.graph.height) > this.canvas.height) {
+          this.graph.top = new_top;
+        }
+        this.mouse.lastpan = { x: event.clientX, y: event.clientY };
+        this.draw();
+      }
+  }
+
+  private mouseleave(event: MouseEvent) {
+    this.mouse.isdown = false;
+    this.mouse.ispan = false;
+    this.mouse.lastpan = { x: 0, y: 0 };
+    this.canvas.style.cursor = 'default';
+  }
+
+  private mouseup(event: MouseEvent) {
+    // const was_click = !this.mouse.ispan;
+    this.mouse.isdown = false;
+    this.mouse.ispan = false;
+    this.mouse.lastpan = { x: 0, y: 0 };
+    this.canvas.style.cursor = 'default';
+    // if (was_click) {
+      // clieck event here
+    // }
   }
 
   private context(event) {
