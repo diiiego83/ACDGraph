@@ -1,6 +1,6 @@
 // [nline x ncolumn] => col_1, col_2, ..., col_nlines  => length column is nlines => [nline x ncolumn]
 // [ncolumn x nline] => line_1, line_2, ..., line_ncol => length line is ncol     => [ncolumn x nline]
-export class ACDImage {
+export class Image {
 
   private _data: Float32Array;    // data values
   private _data_nline: number;    // number of lines (col lenght)

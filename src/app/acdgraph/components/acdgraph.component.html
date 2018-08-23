@@ -31,7 +31,7 @@
   </div>
   <div #daddy style="display: flex; flex-direction: row; flex-grow: 1; margin:50px;">
     <canvas style="flex-grow: 1" #canvas
-            [ngStyle]="style"
+            [ngStyle]="canvas_style"
             width="0" height="0"
             (contextmenu)="context($event)"
             (mousewheel)="handleMouseWheel($event)"
